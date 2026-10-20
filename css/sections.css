@@ -1,0 +1,1008 @@
+/* =========================================================
+   SECTIONS
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   1. ПЕРВЫЙ ЭКРАН — сцена
+   Липкая сцена + бумага, которая наезжает сверху.
+--------------------------------------------------------- */
+.stage-wrap {
+  position: relative;
+  height: calc(var(--vh) * 2);
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: var(--vh);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(26px, 5vh, 54px);
+  padding: clamp(40px, 8vh, 80px) var(--gutter);
+  background:
+    radial-gradient(120% 82% at 50% 26%, var(--wine-deep) 0%, #280710 52%, var(--wine-night) 100%);
+  color: var(--cream);
+}
+
+/* мягкая виньетка — статична, без анимации */
+.stage__veil {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(70% 55% at 50% 40%, rgba(255, 224, 204, .07), transparent 70%),
+    linear-gradient(180deg, rgba(12, 3, 5, .35), transparent 30%, rgba(12, 3, 5, .55));
+  pointer-events: none;
+}
+
+.stage__photos {
+  position: relative;
+  width: min(97vw, 560px);
+  height: min(56vh, 460px);
+  flex: none;
+}
+
+/* Уход сцены — только сдвиг и прозрачность: масштаб или поворот
+   заставили бы браузер заново растрировать тени полароидов. */
+.stage__photos .polaroid {
+  transform: translate3d(0, calc(var(--p, 0) * var(--pf, 1) * -64px), 0);
+  opacity: calc(1 - var(--p, 0) * 1.35);
+}
+
+.polaroid--a {
+  --tilt: -7deg;
+  --pf: 1;
+  left: -5%;
+  top: 2%;
+}
+.polaroid--b {
+  --tilt: 5.5deg;
+  --pf: 1.55;
+  right: -5%;
+  bottom: 2%;
+  width: min(50vw, 248px);
+}
+
+.stage__words {
+  position: relative;
+  text-align: center;
+  max-width: 22ch;
+  opacity: calc(1 - var(--p, 0) * 1.9);
+}
+.stage__line {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(1.35rem, 5.8vw, 2.35rem);
+  line-height: 1.22;
+  letter-spacing: -.01em;
+  color: #F6E9DC;
+}
+.stage__line b {
+  font-weight: inherit;
+  font-style: normal;
+  color: var(--gold-light);
+}
+
+.stage__date {
+  margin-top: clamp(18px, 3.2vh, 34px);
+  font-family: var(--font-text);
+  font-weight: 300;
+  font-size: clamp(1.05rem, 4.4vw, 1.5rem);
+  letter-spacing: .34em;
+  text-indent: .34em;
+  color: rgba(246, 233, 220, .82);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.stage__date:empty { display: none; }
+.stage__line:empty { display: none; }
+
+.stage__cue {
+  position: absolute;
+  left: 50%;
+  bottom: calc(22px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: calc(1 - var(--p, 0) * 2.4);
+}
+.stage__cue-text {
+  font-size: .625rem;
+  letter-spacing: .34em;
+  text-transform: uppercase;
+  color: rgba(246, 233, 220, .62);
+}
+.stage__cue-rule {
+  width: 1px;
+  height: 34px;
+  background: linear-gradient(rgba(246, 233, 220, .45), transparent);
+}
+
+/* --- появление сцены --- */
+body:not(.is-loading) .polaroid--a .polaroid__inner { animation: dropA 1.15s var(--ease-drop) .35s both; }
+body:not(.is-loading) .polaroid--b .polaroid__inner { animation: dropB 1.35s var(--ease-drop) .95s both; }
+body:not(.is-loading) .stage__words { animation: wordsIn .95s var(--ease-out) 1.95s both; }
+body:not(.is-loading) .stage__cue   { animation: cueIn .9s var(--ease-out) 2.5s both; }
+
+@keyframes dropA {
+  0%   { opacity: 0; transform: translate3d(-5%, -52px, 0) rotate(-20deg) scale(1.08); }
+  46%  { opacity: 1; }
+  74%  { transform: translate3d(0, 6px, 0) rotate(-4.2deg) scale(1); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) rotate(var(--tilt)) scale(1); }
+}
+@keyframes dropB {
+  0%   { opacity: 0; transform: translate3d(9%, -74px, 0) rotate(17deg) scale(1.1); }
+  40%  { opacity: 1; }
+  68%  { transform: translate3d(-1%, 9px, 0) rotate(2.4deg) scale(1); }
+  86%  { transform: translate3d(0, -2px, 0) rotate(6.6deg) scale(1); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) rotate(var(--tilt)) scale(1); }
+}
+@keyframes wordsIn {
+  from { opacity: 0; transform: translate3d(0, 14px, 0); clip-path: inset(0 0 102% 0); }
+  to   { opacity: 1; transform: none; clip-path: inset(0 0 -30% 0); }
+}
+@keyframes cueIn { from { opacity: 0; transform: translate(-50%, 10px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  body:not(.is-loading) .polaroid__inner,
+  body:not(.is-loading) .stage__words,
+  body:not(.is-loading) .stage__cue { animation: none; }
+  .stage__photos .polaroid,
+  .stage__words,
+  .stage__cue { opacity: 1; transform: none; }
+  .polaroid--a .polaroid__inner { transform: rotate(-4deg); }
+  .polaroid--b .polaroid__inner { transform: rotate(4deg); }
+  .stage-wrap { height: var(--vh); }
+}
+
+@media (min-width: 768px) {
+  /* Ширины в процентах от сцены: 56 + 52 = 108, значит снимки
+     всегда перекрываются, а не разъезжаются по углам экрана. */
+  .stage__photos { width: min(83vw, 630px); height: min(57vh, 470px); }
+  .stage__words  { max-width: 34ch; }
+  .polaroid--a { width: 56%; left: -4%;  top: 0;    }
+  .polaroid--b { width: 52%; right: -4%; bottom: 0; }
+}
+@media (min-width: 1200px) {
+  .stage__photos { width: 650px; height: 500px; }
+  .stage__line { font-size: 2.45rem; }
+}
+
+/* ---------------------------------------------------------
+   Блок кольца + роза — отдельная сцена после полароидов
+   --rose-p: 0→1 — прогресс скролла внутри rose-wrap (JS)
+--------------------------------------------------------- */
+.rose-wrap {
+  position: relative;
+  height: calc(var(--vh) * 3.2);   /* длиннее — медленнее и «дороже» отматывается */
+  background: #000;
+}
+
+.rose-stage {
+  position: sticky;
+  top: 0;
+  height: var(--vh);
+  overflow: hidden;
+  /* центр — чистый чёрный (= фон кадров спрайта, шва не видно),
+     к краям уходит в винную темноту сцены */
+  background: radial-gradient(120% 90% at 50% 46%,
+              #000 0%, #000 42%, #0b0608 78%, var(--wine-night) 100%);
+}
+
+.rose-stage > * {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Постер остаётся видимым, пока canvas не подтвердит загрузку спрайта. */
+.rose-stage__bg {
+  object-fit: cover;
+  object-position: center 40%;
+  filter: brightness(0.5) saturate(1.4);
+  opacity: 1;
+  transition: opacity 300ms ease;
+}
+
+.rose-stage.is-sprite-ready .rose-stage__bg {
+  opacity: 0;
+}
+
+/* Кольца + роза — canvas, кадр спрайта по прогрессу скролла */
+.rose-stage__rings {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rose-wrap { height: var(--vh); }
+}
+
+/* бумага наезжает на сцену */
+.paper {
+  position: relative;
+  z-index: 2;
+  margin-top: calc(var(--vh) * -1);
+  border-radius: var(--sheet-r) var(--sheet-r) 0 0;
+  background: var(--cream);
+}
+/* тень отбрасывается только у верхней кромки: дешевле, чем box-shadow
+   на блоке высотой в несколько экранов */
+.paper::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0;
+  top: calc(-1 * var(--sheet-r));
+  height: var(--sheet-r);
+  background: linear-gradient(to top, rgba(18, 4, 8, .55), rgba(18, 4, 8, 0));
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .paper { margin-top: 0; }
+}
+
+/* ---------------------------------------------------------
+   2. ПРИГЛАШЕНИЕ
+--------------------------------------------------------- */
+.section--invite { padding-top: clamp(48px, 9vw, 96px); }
+
+.invite__title {
+  font-size: clamp(2.4rem, 10.5vw, 6.4rem);
+  margin-top: .28em;
+  max-width: 11ch;
+}
+.invite__title i {
+  font-style: italic;
+  color: var(--accent);
+}
+
+.invite__body { margin-top: clamp(38px, 7vw, 72px); }
+
+.invite__sign {
+  margin-top: clamp(30px, 5vw, 52px);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.05rem, 4.2vw, 1.5rem);
+  color: var(--accent);
+}
+.invite__sign:empty { display: none; }
+
+/* кадр внутри приглашения */
+.invite__media { margin-top: clamp(38px, 7vw, 64px); }
+.invite__media:empty { display: none; }
+.invite__media .frame { aspect-ratio: 4 / 5; }
+
+@media (min-width: 1024px) {
+  .section--invite .wrap {
+    display: grid;
+    /* Левая колонка течёт естественно, фото — правая с фиксированной шириной */
+    grid-template-columns: 1fr clamp(300px, 34vw, 480px);
+    column-gap: clamp(48px, 5.5vw, 88px);
+    align-items: start;
+  }
+  .section--invite .eyebrow { grid-column: 1; }
+  .invite__title { grid-column: 1; }
+  /* Убираем переопределение margin-top — теперь он задан в общем правиле */
+  .invite__body  { grid-column: 1; margin-top: clamp(22px, 2.8vw, 38px); }
+  /* Фото правая колонка, растягивается на высоту всего текстового блока */
+  .invite__media {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    align-self: stretch;
+    margin-top: 0;
+  }
+  .invite__media .frame { aspect-ratio: 4 / 5; }
+}
+
+/* ---------------------------------------------------------
+   3. ДАНИИЛ И АНАСТАСИЯ
+--------------------------------------------------------- */
+.section--names { overflow: hidden; }
+
+.names__type {
+  margin-top: .35em;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.names__one, .names__two {
+  display: block;
+  font-size: clamp(2.9rem, 15.5vw, 8rem);
+  line-height: .92;
+}
+.names__two { align-self: flex-end; text-align: right; }
+.names__amp {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.7rem, 7vw, 3.4rem);
+  line-height: 1;
+  color: var(--accent);
+  align-self: center;
+  margin-block: .12em;
+}
+
+.names__media {
+  margin-top: clamp(36px, 7vw, 76px);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(14px, 3vw, 34px);
+  align-items: start;
+}
+.names__media:empty { display: none; }
+.names__media .frame:first-child { aspect-ratio: 3 / 4; margin-top: clamp(20px, 5vw, 64px); }
+.names__media .frame:last-child  { aspect-ratio: 4 / 5; }
+
+.names__note {
+  margin-top: clamp(30px, 5vw, 56px);
+  max-width: 30em;
+  color: var(--fg-soft);
+  font-size: var(--t-small);
+}
+.names__note:empty { display: none; }
+
+@media (min-width: 1024px) {
+  .names {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--col-gap);
+    align-items: start;
+  }
+
+  .names .eyebrow { grid-column: 1 / span 12; }
+
+  /* Имена — отдельная ячейка: их межстрочные отступы не должны
+     растягиваться под высоту колонки с фотографиями.
+     subgrid при этом сохраняет выравнивание по общей сетке. */
+  .names__type {
+    grid-column: 1 / span 8;
+    display: grid;
+    grid-template-columns: subgrid;
+    align-content: start;
+    margin-top: .3em;
+  }
+  .names__one { grid-column: 1 / span 8; }
+  .names__amp { grid-column: 3 / span 2; margin: .02em 0; }
+  .names__two { grid-column: 3 / span 6; text-align: left; }
+
+  .names__media {
+    grid-column: 9 / span 4;
+    grid-template-columns: 1fr;
+    gap: clamp(18px, 2vw, 30px);
+    margin-top: .5em;
+  }
+  .names__media .frame:first-child { margin-top: 0; }
+
+  .names__note {
+    grid-column: 3 / span 5;
+    margin-top: clamp(34px, 4vw, 60px);
+    max-width: none;
+  }
+
+  /* Запасной вариант там, где subgrid не поддерживается */
+  @supports not (grid-template-columns: subgrid) {
+    .names__type { display: block; }
+    .names__amp { display: block; padding-left: 25.3%; }
+    .names__two { display: block; padding-left: 25.3%; }
+  }
+}
+
+/* ---------------------------------------------------------
+   4. ИСТОРИЯ
+--------------------------------------------------------- */
+.story { position: relative; display: grid; gap: clamp(44px, 8vw, 92px); }
+
+.story__item {
+  position: relative;
+  padding-left: 30px;
+}
+.story__item::before {
+  content: "";
+  position: absolute;
+  left: 4px; top: 12px; bottom: calc(-1 * clamp(44px, 8vw, 92px));
+  width: 1px;
+  background: var(--rule);
+}
+.story__item:last-child::before { display: none; }
+.story__item::after {
+  content: "";
+  position: absolute;
+  left: 0; top: 9px;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  background: var(--bg);
+}
+
+.story__when {
+  font-size: .6875rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.story__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 6vw, 2.5rem);
+  line-height: 1.08;
+  margin-top: .3em;
+}
+.story__text {
+  margin-top: .9em;
+  max-width: 34em;
+  color: var(--fg-soft);
+  font-size: var(--t-small);
+}
+.story__media { margin-top: clamp(20px, 4vw, 34px); max-width: 420px; aspect-ratio: 4 / 5; }
+
+@media (min-width: 1024px) {
+  .story__item {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--col-gap);
+    padding-left: 0;
+  }
+  .story__when, .story__title, .story__text { grid-column: 1 / span 5; }
+  .story__media { grid-column: 7 / span 6; grid-row: 1 / span 3; margin-top: 0; max-width: none; }
+
+  /* Линия таймлайна уходит в поле слева, чтобы текст стоял
+     на той же вертикали, что и во всех остальных блоках. */
+  .story__item::before { left: -26px; }
+  .story__item::after  { left: -30px; }
+}
+
+/* ---------------------------------------------------------
+   5. ГАЛЕРЕЯ
+--------------------------------------------------------- */
+.gallery {
+  margin-top: clamp(16px, 4vw, 40px);
+  padding-inline: var(--gutter);
+  max-width: var(--measure);
+  margin-inline: auto;
+}
+
+/* Каждый кадр — отпечаток: белое поле, мягкая тень, лёгкий наклон.
+   Так пять разнородных снимков читаются одной композицией,
+   а не пятью отдельными постерами. */
+.shot {
+  position: relative;
+  padding: clamp(6px, 1.1vw, 11px);
+  background: #FFFDF9;
+  box-shadow:
+    0 1px 2px rgba(36, 18, 20, .10),
+    0 12px 28px rgba(36, 18, 20, .15);
+  opacity: 0;
+  transform: rotate(var(--rot, 0deg)) translateY(18px) scale(.985);
+  transition:
+    opacity .8s var(--ease-soft) var(--d, 0ms),
+    transform .9s var(--ease-drop) var(--d, 0ms);
+}
+.shot.is-in,
+.is-in .shot { opacity: 1; transform: rotate(var(--rot, 0deg)); }
+
+/* Внутри отпечатка кадр не «раскрывается» — появляется весь снимок сразу */
+.shot .frame { width: 100%; clip-path: none; background: var(--cream-2); }
+.shot .frame img { transform: none; }
+
+.shot__cap {
+  margin-top: 10px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: .9rem;
+  text-align: center;
+  color: #8A7570;
+}
+.shot__cap:empty { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .shot { opacity: 1; transform: rotate(var(--rot, 0deg)); }
+}
+
+/* ---- мобильный коллаж: вертикальная стопка внахлёст ---- */
+@media (max-width: 899.98px) {
+  .gallery { position: relative; }
+
+  .shot:nth-child(5n+1) { width: 74%; margin-left: 0;    --rot: -1.6deg; }
+  .shot:nth-child(5n+2) { width: 57%; margin-left: auto; margin-top: -13%; --rot: 1.7deg; }
+  .shot:nth-child(5n+3) { width: 65%; margin-left: 5%;   margin-top: -7%;  --rot: -1deg; }
+  .shot:nth-child(5n+4) { width: 61%; margin-left: auto; margin-top: -9%;  --rot: 1.3deg; }
+  .shot:nth-child(5n+5) { width: 82%; margin-left: 4%;   margin-top: -6%;  --rot: -.8deg; }
+
+  /* каждый следующий отпечаток ложится поверх предыдущего */
+  .shot:nth-child(1) { z-index: 1; }
+  .shot:nth-child(2) { z-index: 2; }
+  .shot:nth-child(3) { z-index: 3; }
+  .shot:nth-child(4) { z-index: 4; }
+  .shot:nth-child(5) { z-index: 5; }
+}
+
+/* ---- десктопный коллаж: композиция в процентах ----
+   Позиции заданы долями контейнера, поэтому раскладка
+   одинакова на любой ширине и не зависит от высоты снимков. */
+@media (min-width: 900px) {
+  .gallery {
+    position: relative;
+    aspect-ratio: 16 / 11;
+  }
+  .shot { position: absolute; }
+
+  .shot:nth-child(5n+1) { left: 1%;  top: 2%;  width: 30%; --rot: -1.5deg; z-index: 2; }
+  .shot:nth-child(5n+2) { left: 28%; top: 30%; width: 24%; --rot: 1.2deg;  z-index: 4; }
+  .shot:nth-child(5n+3) { left: 52%; top: 5%;  width: 26%; --rot: -.9deg;  z-index: 1; }
+  .shot:nth-child(5n+4) { left: 69%; top: 45%; width: 30%; --rot: 1.7deg;  z-index: 3; }
+  .shot:nth-child(5n+5) { left: 14%; top: 66%; width: 33%; --rot: -1.1deg; z-index: 5; }
+
+}
+
+/* Вложенные @media поддерживают не все браузеры: один такой блок
+   проглотил все последующие правила файла. Держим их отдельно. */
+@media (min-width: 900px) and (hover: hover) and (pointer: fine) {
+  .shot {
+    transition:
+      opacity .8s var(--ease-soft) var(--d, 0ms),
+      transform .55s var(--ease-out);
+  }
+  .shot:hover { transform: rotate(var(--rot, 0deg)) translateY(-6px) scale(1.015); z-index: 9; }
+}
+
+/* ---------------------------------------------------------
+   6. ИНФОРМАЦИЯ О МЕРОПРИЯТИИ  (винный лист)
+--------------------------------------------------------- */
+.facts {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--rule);
+}
+.fact {
+  display: grid;
+  gap: 6px;
+  padding-block: clamp(24px, 5vw, 38px);
+  border-bottom: 1px solid var(--rule);
+}
+.fact__key {
+  font-size: .6875rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--fg-mute);
+}
+.fact__val {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 6.6vw, 2.9rem);
+  line-height: 1.06;
+  margin: 0;
+  color: var(--fg);
+  overflow-wrap: break-word;
+}
+.fact__sub { font-size: var(--t-small); color: var(--fg-soft); }
+
+.event__note {
+  margin-top: clamp(28px, 5vw, 50px);
+  max-width: 34em;
+  color: var(--fg-soft);
+  font-size: var(--t-small);
+}
+.event__note:empty { display: none; }
+
+@media (min-width: 1024px) {
+  .facts {
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    column-gap: var(--col-gap);
+  }
+  .fact { border-bottom: none; }
+  /* В четыре колонки длинные названия вроде «Первый дворец
+     бракосочетания» не помещались и наезжали на соседний столбец. */
+  .fact__val { font-size: clamp(1.3rem, 1.9vw, 1.8rem); line-height: 1.12; }
+}
+
+/* ---------------------------------------------------------
+   ПОЛНОШИРИННЫЙ КАДР — передышка между блоками
+--------------------------------------------------------- */
+.band {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  background: var(--wine-night);
+  line-height: 0;
+}
+.band:empty { display: none; }
+
+.band img {
+  width: 100%;
+  height: clamp(220px, 38vh, 420px);
+  object-fit: cover;
+  transform: scale(1.05);
+  transition: transform 1.8s var(--ease-out);
+}
+.band.is-in img { transform: scale(1); }
+
+@media (prefers-reduced-motion: reduce) {
+  .band img { transform: none; }
+}
+
+/* ---------------------------------------------------------
+   7. ПРОГРАММА
+--------------------------------------------------------- */
+.schedule__media { margin-bottom: clamp(34px, 6vw, 56px); }
+.schedule__media:empty { display: none; }
+.schedule__media .frame { aspect-ratio: 3 / 2; }
+
+.timeline { display: grid; }
+
+.tl {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 20px;
+  padding-block: clamp(22px, 4.5vw, 34px);
+  border-bottom: 1px solid var(--rule);
+}
+.timeline .tl:first-child { border-top: 1px solid var(--rule); }
+
+.tl__time {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 5.6vw, 2.1rem);
+  line-height: 1;
+  color: var(--accent);
+  font-variant-numeric: lining-nums tabular-nums;
+  padding-top: .06em;
+  min-width: 3.4em;
+}
+.tl__body { align-self: center; }
+.tl__title {
+  font-size: clamp(1rem, 4vw, 1.2rem);
+  line-height: 1.3;
+  font-weight: 400;
+}
+.tl__text {
+  margin-top: .45em;
+  font-size: var(--t-small);
+  color: var(--fg-soft);
+  max-width: 40em;
+}
+
+@media (min-width: 900px) {
+  .tl { grid-template-columns: 6rem 1fr; gap: clamp(30px, 6vw, 90px); align-items: baseline; }
+}
+
+/* на широком экране кадр уходит вправо, программа остаётся слева */
+@media (min-width: 1024px) {
+  .section--schedule .wrap {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--col-gap);
+    align-items: start;
+  }
+  .section--schedule .head { grid-column: 1 / span 6; }
+  .schedule__media { grid-column: 8 / span 5; grid-row: 1 / span 2; margin-bottom: 0; }
+  .schedule__media .frame { aspect-ratio: 4 / 5; }
+  .timeline { grid-column: 1 / span 6; }
+}
+
+/* ---------------------------------------------------------
+   8. ЛОКАЦИИ
+--------------------------------------------------------- */
+.places { display: grid; gap: clamp(46px, 9vw, 90px); }
+
+.place { position: relative; }
+.place__media { aspect-ratio: 4 / 3; margin-bottom: clamp(22px, 4vw, 34px); }
+.place__media:empty { display: none; }
+.place__kind {
+  font-size: .6875rem;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.place__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 7.4vw, 3.1rem);
+  line-height: 1.02;
+  margin-top: .32em;
+  max-width: 14ch;
+}
+.place__addr {
+  margin-top: .8em;
+  color: var(--fg-soft);
+  font-size: var(--t-small);
+  overflow-wrap: anywhere;
+  max-width: 24em;
+}
+.place__note {
+  margin-top: .6em;
+  color: var(--fg-mute);
+  font-size: .8125rem;
+  max-width: 28em;
+}
+.place__note:empty { display: none; }
+.place__link { margin-top: clamp(22px, 4vw, 30px); }
+
+@media (min-width: 1024px) {
+  .places {
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--col-gap);
+    align-items: start;
+  }
+  .place:nth-child(1) { grid-column: 1 / span 6; }
+  .place:nth-child(2) { grid-column: 7 / span 6; margin-top: clamp(48px, 7vw, 100px); }
+}
+
+/* ---------------------------------------------------------
+   9. DRESS CODE
+--------------------------------------------------------- */
+.dress { display: grid; gap: clamp(36px, 7vw, 64px); }
+
+.dress__lead {
+  font-family: var(--font-display);
+  font-size: var(--t-lead);
+  line-height: 1.25;
+  margin-bottom: .8em;
+  max-width: 20ch;
+}
+.dress__lead:empty { display: none; }
+
+.dress__palette {
+  display: grid;
+  gap: clamp(30px, 6vw, 48px);
+}
+.dress__palette:empty { display: none; }
+
+.dress-palette__title {
+  margin-bottom: 18px;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 4.5vw, 2rem);
+  font-weight: 400;
+  color: var(--fg);
+}
+
+.dress-palette__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(14px, 3vw, 22px);
+}
+
+.swatch {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  width: clamp(64px, 19vw, 92px);
+  opacity: 0;
+  transform: translateY(14px) scale(.94);
+  transition: opacity .7s var(--ease-out) var(--d, 0ms), transform .7s var(--ease-drop) var(--d, 0ms);
+}
+.is-in .swatch, .swatch.is-in { opacity: 1; transform: none; }
+.swatch__dot {
+  width: clamp(52px, 15vw, 74px);
+  aspect-ratio: 1;
+  border: 2px solid #B08A52;
+  border-radius: 2px;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .26),
+    0 7px 18px rgba(74, 42, 32, .11);
+}
+.swatch__name {
+  font-size: .625rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--fg-mute);
+  text-align: center;
+  line-height: 1.4;
+}
+
+.dress__looks {
+  margin-top: clamp(44px, 8vw, 84px);
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(12px, 3vw, 28px);
+}
+.dress__looks:empty { display: none; }
+.dress__looks .frame { aspect-ratio: 3 / 4; }
+.dress__looks > *:nth-child(even) { margin-top: clamp(18px, 5vw, 52px); }
+
+.dress__lists {
+  margin-top: clamp(44px, 8vw, 84px);
+  display: grid;
+  gap: clamp(30px, 6vw, 60px);
+}
+.dress__lists:empty { display: none; }
+.dlist__title {
+  font-size: .6875rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--accent);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+}
+.dlist li {
+  padding-block: 12px;
+  border-bottom: 1px solid var(--line-soft);
+  font-size: var(--t-small);
+  color: var(--fg-soft);
+}
+.theme-blush .dlist li { border-bottom-color: rgba(58, 15, 25, .08); }
+
+@media (min-width: 1024px) {
+  .dress {
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--col-gap);
+    align-items: start;
+  }
+  .dress__text    { grid-column: 1 / span 6; }
+  .dress__palette { grid-column: 7 / span 6; }
+
+  .dress__looks { grid-template-columns: repeat(4, 1fr); }
+
+  .dress__lists { grid-template-columns: repeat(12, 1fr); column-gap: var(--col-gap); }
+  .dress__lists > *:nth-child(1) { grid-column: 1 / span 5; }
+  .dress__lists > *:nth-child(2) { grid-column: 7 / span 5; }
+}
+
+/* ---------------------------------------------------------
+   12. СЧЁТЧИК
+--------------------------------------------------------- */
+.count__title { font-size: var(--t-head); margin-top: .3em; }
+
+.count {
+  margin-top: clamp(36px, 7vw, 66px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: clamp(26px, 7vw, 64px);
+}
+.count__unit { display: grid; gap: 8px; }
+.count__num {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 15vw, 6.5rem);
+  line-height: .86;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--fg);
+}
+.count__label {
+  font-size: .625rem;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--fg-mute);
+}
+
+.count__action { margin-top: clamp(34px, 6vw, 58px); }
+
+/* ---------------------------------------------------------
+   13. ПОДАРКИ
+--------------------------------------------------------- */
+.gifts { display: grid; gap: clamp(28px, 5vw, 46px); }
+.gifts__details {
+  padding: clamp(22px, 5vw, 34px);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  font-size: var(--t-small);
+  color: var(--fg-soft);
+}
+.gifts__details:empty { display: none; }
+.gifts__details b { font-weight: 400; color: var(--fg); }
+
+@media (min-width: 900px) {
+  .gifts { grid-template-columns: 1.2fr .8fr; gap: 8%; align-items: start; }
+}
+
+/* ---------------------------------------------------------
+   10. RSVP
+--------------------------------------------------------- */
+.rsvp { max-width: 640px; }
+
+.rsvp__media { margin-bottom: clamp(36px, 6vw, 56px); }
+.rsvp__media:empty { display: none; }
+.rsvp__media .frame { aspect-ratio: 3 / 4; max-width: 340px; }
+
+@media (min-width: 1024px) {
+  .section--rsvp .wrap {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--col-gap);
+    align-items: start;
+  }
+  /* липкий заголовок убран: под ним теперь стоит кадр,
+     колонка должна прокручиваться целиком */
+  .section--rsvp .head { grid-column: 1 / span 5; margin-bottom: 0; }
+  .rsvp__media {
+    grid-column: 1 / span 4;
+    margin-top: clamp(34px, 4vw, 56px);
+    margin-bottom: 0;
+  }
+  .rsvp__media .frame { max-width: none; }
+  .rsvp { grid-column: 7 / span 6; grid-row: 1 / span 2; max-width: none; }
+}
+
+/* ---------------------------------------------------------
+   15. ФИНАЛ
+--------------------------------------------------------- */
+.finale {
+  position: relative;
+  min-height: var(--vh);
+  display: grid;
+  place-items: center;
+  padding: clamp(90px, 18vh, 170px) var(--gutter) clamp(110px, 16vh, 160px);
+  background:
+    radial-gradient(110% 70% at 50% 100%, #3B0A14 0%, #21060B 55%, var(--wine-night) 100%);
+  color: var(--cream);
+  text-align: center;
+  overflow: hidden;
+  border-radius: var(--sheet-r) var(--sheet-r) 0 0;
+  margin-top: calc(-1 * var(--sheet-r));
+}
+
+.finale__media {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1.8s var(--ease-soft);
+}
+.finale.is-in .finale__media { opacity: .34; }
+.finale__media picture { display: block; width: 100%; height: 100%; }
+.finale__media img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transform: scale(1.06);
+  transition: transform 2.4s var(--ease-out);
+}
+.finale.is-in .finale__media picture { display: block; width: 100%; height: 100%; }
+.finale__media img { transform: scale(1); }
+.finale__media::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgba(26, 5, 8, .72), rgba(26, 5, 8, .45) 45%, rgba(26, 5, 8, .88));
+}
+
+.finale__inner { position: relative; max-width: 22ch; }
+
+.finale__eyebrow {
+  font-size: var(--t-eyebrow);
+  letter-spacing: .34em;
+  text-transform: uppercase;
+  color: rgba(227, 196, 141, .8);
+  margin-bottom: 1.6em;
+}
+.finale__eyebrow:empty { display: none; }
+
+.finale__text {
+  font-size: clamp(2.4rem, 11vw, 5.4rem);
+  font-style: italic;
+  line-height: 1.02;
+  color: #F7EADE;
+}
+.finale__sub {
+  margin-top: 1.5em;
+  font-size: var(--t-small);
+  color: rgba(247, 234, 222, .74);
+  max-width: 30ch;
+  margin-inline: auto;
+}
+.finale__sub:empty { display: none; }
+
+.finale__rule {
+  display: block;
+  width: 1px;
+  height: 56px;
+  margin: clamp(34px, 7vw, 56px) auto clamp(22px, 4vw, 34px);
+  background: linear-gradient(rgba(227, 196, 141, .55), transparent);
+}
+.finale__names {
+  font-size: .6875rem;
+  letter-spacing: .38em;
+  text-transform: uppercase;
+  color: rgba(247, 234, 222, .68);
+}
+
+/* финал появляется мягко */
+.finale__inner > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 1.1s var(--ease-soft) var(--d, 0ms), transform 1.1s var(--ease-out) var(--d, 0ms);
+}
+.finale.is-in .finale__inner > * { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .finale__inner > * { opacity: 1; transform: none; }
+  .finale__media { opacity: .3; }
+}

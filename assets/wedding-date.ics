@@ -1,0 +1,16 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Daniil and Anastasia//Wedding//RU
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:20270423-wedding-daniil-anastasia@example.local
+DTSTAMP:20261017T180000Z
+DTSTART;TZID=Europe/Moscow:20270423T141500
+DTEND;TZID=Europe/Moscow:20270424T000000
+SUMMARY:Свадьба Даниила и Анастасии
+LOCATION:Первый дворец бракосочетания\, Английская набережная\, 28\, Санкт-Петербург
+DESCRIPTION:Церемония во Дворце бракосочетания. Продолжение вечера — ресторан Le Glamour\, Вознесенский проспект\, 44–46.
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR
