@@ -172,61 +172,11 @@ body:not(.is-loading) .stage__cue   { animation: cueIn .9s var(--ease-out) 2.5s 
   .stage__line { font-size: 2.45rem; }
 }
 
-/* ---------------------------------------------------------
-   Блок кольца + роза — отдельная сцена после полароидов
-   --rose-p: 0→1 — прогресс скролла внутри rose-wrap (JS)
---------------------------------------------------------- */
-.rose-wrap {
-  position: relative;
-  height: calc(var(--vh) * 3.2);   /* длиннее — медленнее и «дороже» отматывается */
-  background: #000;
-}
-
-.rose-stage {
-  position: sticky;
-  top: 0;
-  height: var(--vh);
-  overflow: hidden;
-  /* центр — чистый чёрный (= фон кадров спрайта, шва не видно),
-     к краям уходит в винную темноту сцены */
-  background: radial-gradient(120% 90% at 50% 46%,
-              #000 0%, #000 42%, #0b0608 78%, var(--wine-night) 100%);
-}
-
-.rose-stage > * {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-/* Постер остаётся видимым, пока canvas не подтвердит загрузку спрайта. */
-.rose-stage__bg {
-  object-fit: cover;
-  object-position: center 40%;
-  filter: brightness(0.5) saturate(1.4);
-  opacity: 1;
-  transition: opacity 300ms ease;
-}
-
-.rose-stage.is-sprite-ready .rose-stage__bg {
-  opacity: 0;
-}
-
-/* Кольца + роза — canvas, кадр спрайта по прогрессу скролла */
-.rose-stage__rings {
-  display: block;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .rose-wrap { height: var(--vh); }
-}
-
-/* бумага наезжает на сцену */
+/* Основной лист следует сразу за первым экраном. */
 .paper {
   position: relative;
   z-index: 2;
-  margin-top: calc(var(--vh) * -1);
+  margin-top: 0;
   border-radius: var(--sheet-r) var(--sheet-r) 0 0;
   background: var(--cream);
 }
@@ -241,10 +191,6 @@ body:not(.is-loading) .stage__cue   { animation: cueIn .9s var(--ease-out) 2.5s 
   background: linear-gradient(to top, rgba(18, 4, 8, .55), rgba(18, 4, 8, 0));
   pointer-events: none;
 }
-@media (prefers-reduced-motion: reduce) {
-  .paper { margin-top: 0; }
-}
-
 /* ---------------------------------------------------------
    2. ПРИГЛАШЕНИЕ
 --------------------------------------------------------- */

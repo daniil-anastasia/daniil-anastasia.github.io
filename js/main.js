@@ -9,7 +9,6 @@ import {
 } from './modules/render.js?v=13';
 import { initStage } from './modules/stage.js';
 import { initReveal, initParallax } from './modules/motion.js';
-import { initRoseScroll } from './modules/rose.js?v=12';
 import { initNav } from './modules/nav.js';
 import { initRsvp } from './modules/rsvp.js';
 import { initCountdown } from './modules/countdown.js';
@@ -48,7 +47,6 @@ async function boot() {
   initStage(cfg);
   initReveal();
   initParallax();
-  initRoseScroll();
   initNav(cfg);
   initRsvp(cfg);
   initCountdown(cfg);

@@ -27,15 +27,6 @@
 `w` и `h` — реальные пиксели исходника. Они нужны, чтобы страница
 не «прыгала» во время загрузки.
 
-## Анимация колец
-
-- `rose-clean.webp` — очищенный кадр розы без исходного украшения.
-- `rings-sprite.webp` — 24 кадра (6×4) скролл-анимации двух золотых колец.
-- Исходник колец: CC0-модель Paul Wortmann с OpenGameArt; модель и сведения
-  о лицензии сохранены в `D:/claude-assets/models/opengameart-ring-paul-wortmann/`.
-- Проверочные материалы: `tools/previews/rings-v8-sheet.png` и
-  `tools/previews/rings-v8.gif`.
-
 Быстрая конвертация (ImageMagick):
 
 ```

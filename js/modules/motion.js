@@ -6,8 +6,7 @@ import { $$, prefersReducedMotion, onFrame } from './utils.js';
 const TARGETS = [
   '.reveal', '.reveal-lines', '.rule',
   '.frame', '.swatch', '.shot', '.place',
-  '.story__item', '.fact', '.tl', '.finale', '.band',
-  '.rose-stage__bg'
+  '.story__item', '.fact', '.tl', '.finale', '.band'
 ].join(', ');
 
 export function initReveal() {
